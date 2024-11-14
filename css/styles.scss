@@ -1,0 +1,130 @@
+// Variables
+$black: #404040;
+$white: #f0f0f0;
+$red: #fa0b0b;
+
+// Styles globaux
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-family: 'Teko';
+    font-weight: 100;
+}
+
+@media screen and (min-width: 1280px) {
+    body {
+        width: 70%;
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    body {
+        width: 90%;
+    }
+}
+
+body {
+    margin: auto;
+    font-weight: 100;
+}
+
+h1 {
+    font-weight: 300;
+    font-size: xx-large;
+    color: $white;
+}
+
+h2 {
+    font-weight: 700;
+    font-size: xx-large;
+}
+
+h3 {
+    font-weight: 500;
+    font-size: large;
+}
+
+button {
+    cursor: pointer;
+    color: $white;
+    background-color: $red;
+    border: none;
+}
+
+header {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    background-color: #61787f;
+    border: 1px solid $black;
+    padding: 10px;
+    margin-top: 20px;
+    align-items: center;
+    gap: 20px;
+
+    img {
+        max-height: 100px;
+    }
+}
+
+main {
+    margin-top: 20px;
+}
+
+.best-movie {
+    border: 3px solid $black;
+    padding: 20px;
+
+    .best-movie__movie {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 20px;
+
+        h3 {
+            font-size: xx-large;
+        }
+
+        div button {
+            border-radius: 20px;
+            padding: 20px 40px;
+        }
+    }
+}
+
+.best-movies, .genre-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+
+    .best-movies__movie {
+        position: relative;
+        overflow: hidden;
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+
+        div {
+            position: absolute;
+            top: 10%;
+            left: 0;
+            width: 100%;
+            background-color: rgba(40, 40, 40, 0.4);
+            padding: 20px;
+
+            h3 {
+                color: $white;
+            }
+
+            button {
+                background-color: $black;
+                color: $white;
+                border-radius: 20px;
+                padding: 5px 10px;
+            }
+        }
+    }
+}
