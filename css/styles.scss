@@ -1,7 +1,33 @@
-// Variables
-$black: #404040;
-$white: #f0f0f0;
-$red: #fa0b0b;
+// Variables globales
+$black: #000000;
+$white: #ffffff;
+$red: #ff0000;
+$darkgray: #404040;
+
+$font-size-xxlarge: xx-large;
+$font-size-large: 3vw;
+$font-size-medium: 1.5vw;
+$padding-small: 10px;
+$padding-large: 20px;
+$gap-large: 30px;
+$border-radius: 20px;
+
+// Mixins
+@mixin typography($size, $weight: normal, $color: inherit) {
+    font-size: $size;
+    font-weight: $weight;
+    color: $color;
+}
+
+@mixin button-style($bg-color, $text-color: $white) {
+    cursor: pointer;
+    color: $text-color;
+    background-color: $bg-color;
+    border: none;
+    font-weight: bold;
+    padding: $padding-small $padding-large;
+    border-radius: $border-radius;
+}
 
 // Styles globaux
 * {
@@ -14,44 +40,24 @@ html {
     font-weight: 100;
 }
 
-@media screen and (min-width: 1280px) {
-    body {
-        width: 70%;
-    }
-}
-
-@media screen and (max-width: 1280px) {
-    body {
-        width: 90%;
-    }
-}
-
 body {
     margin: auto;
     font-weight: 100;
+    width: 60%;
+    margin-bottom: $padding-large;
 }
 
 h1 {
-    font-weight: 300;
-    font-size: xx-large;
-    color: $white;
+    @include typography($font-size-xxlarge, 300, $white);
 }
 
-h2 {
-    font-weight: 700;
-    font-size: xx-large;
-}
-
-h3 {
-    font-weight: 500;
-    font-size: large;
+h2, label {
+    @include typography($font-size-large, 700);
+    margin: $padding-large 0;
 }
 
 button {
-    cursor: pointer;
-    color: $white;
-    background-color: $red;
-    border: none;
+    @include button-style($red);
 }
 
 header {
@@ -59,52 +65,122 @@ header {
     grid-template-columns: auto 1fr;
     background-color: #61787f;
     border: 1px solid $black;
-    padding: 10px;
-    margin-top: 20px;
+    padding: $padding-small;
+    margin-top: $padding-large;
     align-items: center;
-    gap: 20px;
+    gap: $padding-large;
 
     img {
         max-height: 100px;
     }
 }
 
-main {
-    margin-top: 20px;
+/* Liste Déroulante */
+.dropdown {
+    position: relative;
+    display: inline-block;
+    margin-left: $padding-small;
+    width: 250px;
+    border: 2px solid $black;
 }
 
-.best-movie {
-    border: 3px solid $black;
-    padding: 20px;
+.dropdown-button {
+    @include typography($font-size-medium, bold, $black);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+    padding: $padding-small $padding-large;
+    background-color: $white;
+    border: none;
+    cursor: pointer;
+}
 
-    .best-movie__movie {
-        display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 20px;
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    background-color: $white;
+    border: 2px solid $black;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+    max-height: 200px;
+    overflow-y: auto;
+    scrollbar-width: thin;
 
-        h3 {
-            font-size: xx-large;
+    .dropdown-item {
+        @include typography($font-size-medium, bold);
+        padding: $padding-small;
+        border-bottom: 1px solid $black;
+        cursor: pointer;
+
+        &:last-child {
+            border-bottom: none;
         }
 
-        div button {
-            border-radius: 20px;
-            padding: 20px 40px;
+        &:hover {
+            background-color: #ddd;
         }
     }
 }
 
-.best-movies, .genre-section {
+.arrow {
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid $black;
+    margin-left: auto;
+}
+
+/* Affichage des films */
+.best-movie {
+    border: 5px solid $black;
+    padding: $padding-small;
+
+    &__movie {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: $padding-large;
+        position: relative;
+
+        h3 {
+            @include typography($font-size-large);
+        }
+
+        button {
+            @include button-style($red);
+            position: absolute;
+            right: $padding-large;
+            bottom: $padding-large;
+            padding: $padding-large $padding-large;
+        }
+    }
+}
+
+.best-movies {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 20px;
+    gap: $gap-large;
 
-    .best-movies__movie {
+    h2 {
+        grid-column: 1 / -1;
+    }
+
+    &__movie {
         position: relative;
         overflow: hidden;
 
         img {
             width: 100%;
             height: auto;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
         }
 
         div {
@@ -113,17 +189,23 @@ main {
             left: 0;
             width: 100%;
             background-color: rgba(40, 40, 40, 0.4);
-            padding: 20px;
+            padding: $padding-small;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 30%;
 
             h3 {
-                color: $white;
+                @include typography($font-size-medium, bold, $white);
             }
 
             button {
-                background-color: $black;
-                color: $white;
-                border-radius: 20px;
-                padding: 5px 10px;
+                @include button-style($darkgray);
+                padding: $padding-small $padding-small;
+
+                position: absolute;
+                bottom: 10px;
+                right: 30px;
             }
         }
     }

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 * {
   margin: 0;
   padding: 0;
@@ -8,49 +9,41 @@ html {
   font-weight: 100;
 }
 
-@media screen and (min-width: 1280px) {
-  body {
-    width: 70%;
-  }
-}
-@media screen and (max-width: 1280px) {
-  body {
-    width: 90%;
-  }
-}
 body {
   margin: auto;
   font-weight: 100;
+  width: 60%;
+  margin-bottom: 20px;
 }
 
 h1 {
+  font-size: xx-large;
   font-weight: 300;
-  font-size: xx-large;
-  color: #f0f0f0;
+  color: #ffffff;
 }
 
-h2 {
+h2, label {
+  font-size: 3vw;
   font-weight: 700;
-  font-size: xx-large;
-}
-
-h3 {
-  font-weight: 500;
-  font-size: large;
+  color: inherit;
+  margin: 20px 0;
 }
 
 button {
   cursor: pointer;
-  color: #f0f0f0;
-  background-color: #fa0b0b;
+  color: #ffffff;
+  background-color: #ff0000;
   border: none;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 20px;
 }
 
 header {
   display: grid;
   grid-template-columns: auto 1fr;
   background-color: #61787f;
-  border: 1px solid #404040;
+  border: 1px solid #000000;
   padding: 10px;
   margin-top: 20px;
   align-items: center;
@@ -60,56 +53,147 @@ header img {
   max-height: 100px;
 }
 
-main {
-  margin-top: 20px;
+/* Liste Déroulante */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+  width: 250px;
+  border: 2px solid #000000;
 }
 
+.dropdown-button {
+  font-size: 1.5vw;
+  font-weight: bold;
+  color: #000000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 20px;
+  background-color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  background-color: #ffffff;
+  border: 2px solid #000000;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  box-sizing: border-box;
+  max-height: 200px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.dropdown-menu .dropdown-item {
+  font-size: 1.5vw;
+  font-weight: bold;
+  color: inherit;
+  padding: 10px;
+  border-bottom: 1px solid #000000;
+  cursor: pointer;
+}
+.dropdown-menu .dropdown-item:last-child {
+  border-bottom: none;
+}
+.dropdown-menu .dropdown-item:hover {
+  background-color: #ddd;
+}
+
+.arrow {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #000000;
+  margin-left: auto;
+}
+
+/* Affichage des films */
 .best-movie {
-  border: 3px solid #404040;
-  padding: 20px;
+  border: 5px solid #000000;
+  padding: 10px;
 }
-.best-movie .best-movie__movie {
+.best-movie__movie {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 20px;
+  position: relative;
 }
-.best-movie .best-movie__movie h3 {
-  font-size: xx-large;
+.best-movie__movie h3 {
+  font-size: 3vw;
+  font-weight: normal;
+  color: inherit;
 }
-.best-movie .best-movie__movie div button {
+.best-movie__movie button {
+  cursor: pointer;
+  color: #ffffff;
+  background-color: #ff0000;
+  border: none;
+  font-weight: bold;
+  padding: 10px 20px;
   border-radius: 20px;
-  padding: 20px 40px;
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  padding: 20px 20px;
 }
 
-.best-movies, .genre-section {
+.best-movies {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
+  gap: 30px;
 }
-.best-movies .best-movies__movie, .genre-section .best-movies__movie {
+.best-movies h2 {
+  grid-column: 1/-1;
+}
+.best-movies__movie {
   position: relative;
   overflow: hidden;
 }
-.best-movies .best-movies__movie img, .genre-section .best-movies__movie img {
+.best-movies__movie img {
   width: 100%;
   height: auto;
+  aspect-ratio: 4/3;
+  object-fit: cover;
 }
-.best-movies .best-movies__movie div, .genre-section .best-movies__movie div {
+.best-movies__movie div {
   position: absolute;
   top: 10%;
   left: 0;
   width: 100%;
   background-color: rgba(40, 40, 40, 0.4);
-  padding: 20px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 30%;
 }
-.best-movies .best-movies__movie div h3, .genre-section .best-movies__movie div h3 {
-  color: #f0f0f0;
+.best-movies__movie div h3 {
+  font-size: 1.5vw;
+  font-weight: bold;
+  color: #ffffff;
 }
-.best-movies .best-movies__movie div button, .genre-section .best-movies__movie div button {
+.best-movies__movie div button {
+  cursor: pointer;
+  color: #ffffff;
   background-color: #404040;
-  color: #f0f0f0;
+  border: none;
+  font-weight: bold;
+  padding: 10px 20px;
   border-radius: 20px;
-  padding: 5px 10px;
+  padding: 10px 10px;
+  position: absolute;
+  bottom: 10px;
+  right: 30px;
 }
 
 /*# sourceMappingURL=styles.css.map */
