@@ -332,7 +332,6 @@ function updateMoviesVisibility(sectionId) {
     }
 }
 
-
 // Appliquer la visibilité dynamique après ajout des films
 function applyDynamicVisibility(sectionId) {
     updateMoviesVisibility(sectionId);
@@ -343,41 +342,38 @@ function applyDynamicVisibility(sectionId) {
 function displayModalWindow(movie) {
     const closeButton = document.createElement('button');
     const title = document.createElement('h2');
-    const otherdatas = document.createElement('div');
     const image = document.createElement('img');
-    const directors = document.createElement('div');
-    const actors = document.createElement('div');
+    const details = document.createElement('div');
+    const summary = document.createElement('p');
+    const directors = document.createElement('p');
+    const actors = document.createElement('p');
 
-    // Gérer les genres comme une liste
-    const genres = Array.isArray(movie.genres) ? movie.genres.join(', ') : movie.genres;
-
+    // Mise en place des données du film
     title.textContent = movie.title;
-    otherdatas.innerHTML = `
-        <p>${movie.year} - ${genres}</p>
-        <p>IMDB score: ${movie.imdb_score}/10</p>
-    `;
-    image.setAttribute('src', movie.image_url);
-    directors.innerHTML = `<p>Réalisé par :</p><p>${movie.directors}</p>`;
-    actors.innerHTML = `<p>Avec :</p><p>${movie.actors}</p>`;
+    image.setAttribute('src', movie.image_url || '../img/image_not_found.png');
+    image.setAttribute('alt', `Affiche du film ${movie.title}`);
+    summary.textContent = movie.description || 'Pas de description disponible.';
+    directors.innerHTML = `<strong>Réalisé par :</strong> ${movie.directors || 'Non spécifié'}`;
+    actors.innerHTML = `<strong>Avec :</strong> ${movie.actors || 'Non spécifié'}`;
 
-    closeButton.className = 'close';
+    closeButton.className = 'close-button';
     closeButton.textContent = 'Fermer';
-
     closeButton.addEventListener('click', () => {
         modalWindow.style.display = 'none';
-        modalWindow.innerHTML = ''; // Vide la modale
-        document.body.style.overflow = 'auto'; // Réactive le défilement
+        modalWindow.innerHTML = '';
+        document.body.style.overflow = 'auto';
     });
 
+    // Ajout des éléments dans la fenêtre modale
     modalWindow.appendChild(title);
-    modalWindow.appendChild(otherdatas);
     modalWindow.appendChild(image);
-    modalWindow.appendChild(directors);
-    modalWindow.appendChild(actors);
+    details.appendChild(summary);
+    details.appendChild(directors);
+    details.appendChild(actors);
+    modalWindow.appendChild(details);
     modalWindow.appendChild(closeButton);
 
-    modalWindow.style.display = 'flex'; // Affiche la modale
-
-    // Empêche le scroll de la page
+    // Affiche la modale
+    modalWindow.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }

@@ -210,19 +210,30 @@ header img {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 50%;
-    max-width: 600px;
-    height: auto;
+    max-width: 800px;
     padding: 20px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border: 5px solid #000000;
+    background-color: #ffffff;
+    border: 3px solid #000000;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     z-index: 1000;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    overflow: auto;
   }
   .modal-window h2 {
-    margin: 0;
+    font-size: 3vw;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 10px;
+  }
+  .modal-window img {
+    width: 200px; /* Taille de l'image */
+    height: auto;
+    margin-right: 20px;
+    float: left;
+    border: 2px solid #000000;
+  }
+  .modal-window div {
+    margin-top: 10px;
+    line-height: 1.5;
   }
   .modal-window .close-button {
     cursor: pointer;
@@ -237,6 +248,11 @@ header img {
     right: 10px;
     font-size: 1.5vw;
     cursor: pointer;
+  }
+  .modal-window p {
+    margin-bottom: 10px;
+    color: #404040;
+    font-size: 1.5vw;
   }
 }
 @media screen and (min-width: 769px) and (max-width: 1279px) {

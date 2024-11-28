@@ -245,31 +245,48 @@ header {
         left: 50%;
         transform: translate(-50%, -50%);
         width: 50%;
-        max-width: 600px;
-        height: auto;
+        max-width: 800px;
         padding: $padding-large;
-        background-color: rgba(255, 255, 255, 0.9);
-        border: 5px solid $black;
+        background-color: $white;
+        border: 3px solid $black;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 1000;
-        
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-
-        h2 {
-            margin: 0;
-        }
-    
-        .close-button {
-            @include button-style($red, $white);
-            position: absolute;
-            top: $padding-small;
-            right: $padding-small;
-            font-size: $font-size-medium;
-            cursor: pointer;
-        }
+        overflow: auto;
     }
+    
+    .modal-window h2 {
+        @include typography($font-size-large, bold, $black);
+        margin-bottom: $padding-small;
+    }
+    
+    .modal-window img {
+        width: 200px; /* Taille de l'image */
+        height: auto;
+        margin-right: $padding-large;
+        float: left;
+        border: 2px solid $black;
+    }
+    
+    .modal-window div {
+        margin-top: $padding-small;
+        line-height: 1.5;
+    }
+    
+    .modal-window .close-button {
+        @include button-style($red, $white);
+        position: absolute;
+        top: $padding-small;
+        right: $padding-small;
+        font-size: $font-size-medium;
+        cursor: pointer;
+    }
+    
+    .modal-window p {
+        margin-bottom: $padding-small;
+        color: $darkgray;
+        font-size: $font-size-medium;
+    }
+    
      
 }
 
