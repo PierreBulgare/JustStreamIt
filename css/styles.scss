@@ -1,4 +1,6 @@
+// ---------------------------
 // Variables globales
+// ---------------------------
 $black: #000000;
 $white: #ffffff;
 $red: #ff0000;
@@ -9,10 +11,13 @@ $font-size-large: 3vw;
 $font-size-medium: 1.5vw;
 $padding-small: 10px;
 $padding-large: 20px;
+$padding-xxlarge: 30px;
 $gap-large: 30px;
 $border-radius: 20px;
 
+// ---------------------------
 // Mixins
+// ---------------------------
 @mixin typography($size, $weight: normal, $color: inherit) {
     font-size: $size;
     font-weight: $weight;
@@ -29,7 +34,9 @@ $border-radius: 20px;
     border-radius: $border-radius;
 }
 
+// ---------------------------
 // Styles globaux
+// ---------------------------
 * {
     margin: 0;
     padding: 0;
@@ -60,6 +67,9 @@ button {
     @include button-style($red);
 }
 
+// ---------------------------
+// Header
+// ---------------------------
 header {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -75,12 +85,14 @@ header {
     }
 }
 
-/* Liste Déroulante */
+// ---------------------------
+// Dropdown
+// ---------------------------
 .dropdown {
     position: relative;
     display: inline-block;
     margin-left: $padding-small;
-    width: 250px;
+    max-width: 250px;
     border: 2px solid $black;
 }
 
@@ -136,9 +148,15 @@ header {
     border-right: 10px solid transparent;
     border-top: 10px solid $black;
     margin-left: auto;
+    right: 0;
 }
 
-/* Affichage des films */
+.dropdown-container {
+    display: flex;
+    align-items: center;
+}
+
+
 .best-movie {
     border: 5px solid $black;
     padding: $padding-small;
@@ -158,55 +176,326 @@ header {
             position: absolute;
             right: $padding-large;
             bottom: $padding-large;
-            padding: $padding-large $padding-large;
         }
     }
 }
 
-.best-movies {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: $gap-large;
-
-    h2 {
-        grid-column: 1 / -1;
+// ---------------------------
+// Desktop styles
+// ---------------------------
+@media screen and (min-width: 1280px) {
+    .show-more, .show-less {
+        display: none !important;
     }
 
-    &__movie {
-        position: relative;
-        overflow: hidden;
+    .best-movies {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: $gap-large;
+
+        h2 {
+            grid-column: 1 / -1;
+        }
+
+        &__movie {
+            position: relative;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                object-fit: cover;
+            }
+
+            div {
+                position: absolute;
+                top: 10%;
+                left: 0;
+                width: 100%;
+                background-color: rgba(40, 40, 40, 0.4);
+                padding: $padding-small;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 30%;
+
+                h3 {
+                    @include typography($font-size-medium, bold, $white);
+                }
+
+                button {
+                    @include button-style($darkgray);
+                    position: absolute;
+                    bottom: $padding-small; // Alignement bas
+                    right: $padding-xxlarge; // Alignement à droite
+                    padding: $padding-small $padding-large;
+                }
+            }
+        }
+    }
+
+    .best-movies__movie {
+        display: block !important;
+    }
+
+    .modal-window {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50%;
+        max-width: 600px;
+        height: auto;
+        padding: $padding-large;
+        background-color: rgba(255, 255, 255, 0.9);
+        border: 5px solid $black;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        h2 {
+            margin: 0;
+        }
+    
+        .close-button {
+            @include button-style($red, $white);
+            position: absolute;
+            top: $padding-small;
+            right: $padding-small;
+            font-size: $font-size-medium;
+            cursor: pointer;
+        }
+    }
+     
+}
+
+
+// ---------------------------
+// Tablet styles
+// ---------------------------
+@media screen and (min-width: 769px) and (max-width: 1279px) {
+    body {
+        width: 90%;
+    }
+
+    .show-more, .show-less {
+        display: flex;
+        @include button-style($red);
+        padding: $padding-large;
+        flex-wrap: wrap;
+        justify-self: center;
+        justify-content: space-around;
+        grid-column: 1 / -1;
+        min-width: 50%;
+        align-content: center;
+    }
+
+    .best-movies {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: $gap-large;
+
+        h2 {
+            grid-column: 1 / -1;
+        }
+
+        &__movie {
+            position: relative;
+            overflow: hidden;
+
+            img {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                object-fit: cover;
+            }
+
+            div {
+                position: absolute;
+                top: 10%;
+                left: 0;
+                width: 100%;
+                background-color: rgba(40, 40, 40, 0.4);
+                padding: $padding-small;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 30%;
+
+                h3 {
+                    @include typography($font-size-xxlarge, bold, $white);
+                }
+
+                button {
+                    @include button-style($darkgray);
+                    position: absolute;
+                    bottom: $padding-small; // Alignement bas
+                    right: $padding-xxlarge; // Alignement à droite
+                    padding: $padding-small $padding-large;
+                }
+            }
+        }
+    }
+
+    .best-movies__movie {
+        &:nth-child(n+5) {
+            display: none;
+        }
+        &:nth-child(-n+4) {
+            display: block;
+        }
+    }
+}
+
+// ---------------------------
+// Mobile styles
+// ---------------------------
+@media screen and (max-width: 768px) {
+    body {
+        width: 90%;
+    }
+
+    h1 {
+        display: none;
+    }
+
+    h2, label {
+        font-size: xx-large;
+    }
+
+    header {
+        grid-template-columns: 1fr;
+        justify-content: center;
 
         img {
-            width: 100%;
-            height: auto;
-            aspect-ratio: 4 / 3;
-            object-fit: cover;
+            max-height: 100px;
+            margin: 0 auto;
         }
+    }
 
-        div {
-            position: absolute;
-            top: 10%;
-            left: 0;
-            width: 100%;
-            background-color: rgba(40, 40, 40, 0.4);
-            padding: $padding-small;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 30%;
+    .dropdown-button {
+        @include typography($font-size-large, bold);
+    }
+
+    .dropdown-menu {
+        .dropdown-item {
+            @include typography($font-size-large, bold);
+        }
+    }
+
+    .best-movie {
+        border: 5px solid $black;
+        padding: $padding-small;
+
+        &__movie {
+            display: grid;
+            grid-template-rows: auto;
+            gap: $padding-large;
+
+            img {
+                grid-column: 1 / -1;
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                object-fit: cover;
+            }
 
             h3 {
-                @include typography($font-size-medium, bold, $white);
+                font-size: xx-large;
             }
 
-            button {
-                @include button-style($darkgray);
-                padding: $padding-small $padding-small;
+            div {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
 
-                position: absolute;
-                bottom: 10px;
-                right: 30px;
+                h3, p {
+                    grid-column: 1 / -1;
+                }
+
+                button {
+                    @include button-style($red);
+                    grid-column: 2 / 3;
+                }
             }
         }
+    }
+
+    .best-movies {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: $gap-large;
+
+        h2 {
+            grid-column: 1 / -1;
+        }
+
+        &__movie {
+            position: relative;
+            overflow: hidden;
+
+            &:nth-child(n+3) {
+                display: none;
+            }
+            &:nth-child(-n+2) {
+                display: block;
+            }
+
+            img {
+                width: 100%;
+                aspect-ratio: 4 / 3;
+                object-fit: cover;
+            }
+
+            div {
+                position: absolute;
+                top: 10%;
+                left: 0;
+                width: 100%;
+                background-color: rgba(40, 40, 40, 0.4);
+                padding: $padding-small;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                height: 30%;
+
+                h3 {
+                    @include typography($font-size-xxlarge, bold, $white);
+                }
+
+                button {
+                    @include button-style($darkgray);
+                    position: absolute;
+                    bottom: $padding-small; // Alignement bas
+                    right: $padding-xxlarge; // Alignement à droite
+                    padding: $padding-small $padding-large;
+                }
+            }
+        }
+
+        .show-more, .show-less {
+            display: flex;
+            @include button-style($red);
+            padding: $padding-large;
+            flex-wrap: wrap;
+            justify-self: center;
+            justify-content: space-around;
+            grid-column: 1 / -1;
+            min-width: 50%;
+            align-content: center;
+        }
+    }
+}
+
+.best-movies__movie {
+    display: none;
+
+    &.visible {
+        display: flex;
+    }
+
+    &.hidden {
+        display: none;
     }
 }
