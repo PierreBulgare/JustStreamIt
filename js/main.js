@@ -2,6 +2,7 @@
 let allGenres = [];
 const main = document.querySelector("main");
 const modalWindow = document.querySelector('.modal-window');
+const defaultImageUrl = '../img/image_not_found.png';
 
 // Récupère les données via l'API
 async function fetchDatas(baseUrl, maxPages, datas, genre = null) {
@@ -22,11 +23,31 @@ async function fetchDatas(baseUrl, maxPages, datas, genre = null) {
             }
 
             const data = await response.json();
-            if (data.results && data.results.length > 0) {
-                results = results.concat(data.results);
+            if (datas === "genres") {
+                if (data.results && data.results.length > 0) {
+                    results = results.concat(data.results);
+                }
             } else {
-                console.warn(`Aucune donnée trouvée à la page ${page}`);
-                break;
+                if (data.results && data.results.length > 0) {
+                    // Récupérer les détails de chaque film
+                    for (const movie of data.results) {
+                        try {
+                            movieUrl = `http://localhost:8000/api/v1/titles/${movie.id}`;
+                            const movieResponse = await fetch(movieUrl);
+                            if (!movieResponse.ok) {
+                                console.warn(`Impossible de récupérer les détails du film avec ID: ${movie.id}`);
+                                continue;
+                            }
+                            const movieDetails = await movieResponse.json();
+                            results.push(movieDetails);
+                        } catch (movieError) {
+                            console.error(`Erreur lors de la récupération des détails pour le film ID ${movie.id}:`, movieError);
+                        }
+                    }
+                } else {
+                    console.warn(`Aucune donnée trouvée à la page ${page}`);
+                    break;
+                }
             }
         } catch (error) {
             console.error('Erreur réseau ou de récupération des données:', error);
@@ -69,9 +90,18 @@ Promise.all([
     main.innerHTML = '<p>Impossible de récupérer les données. Veuillez réessayer plus tard.</p>';
 });
 
+// Vérifie si une image de film existe
+async function checkImageExists(url) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+    } catch (error) {
+        return false;
+    }
+}
 
 // Crée un élément HTML pour un film
-function createMovieElement(movie, className = 'best-movies__movie') {
+async function createMovieElement(movie, className = 'best-movies__movie') {
     const movieElement = document.createElement('div');
     movieElement.className = className;
 
@@ -80,35 +110,38 @@ function createMovieElement(movie, className = 'best-movies__movie') {
     detailButton.textContent = 'Détails';
 
     const description = movie.description ? `<p>${movie.description}</p>` : '<p>Pas de description</p>';
-    const defaultImageUrl = '../img/image_not_found.png';
 
-    detailButton.addEventListener('click', () => {
-        displayModalWindow(movie);
+    let imageUrl = movie.image_url;
+
+    // Vérifier si l'image existe
+    if (!(await checkImageExists(imageUrl))) {
+        imageUrl = defaultImageUrl;
+    }
+
+    detailButton.addEventListener('click', async () => {
+        await displayModalWindow(movie);
         modalWindow.style.display = 'block';
     });
 
     movieElement.innerHTML = `
         <img 
-            src="${movie.image_url}" 
-            alt="Image du film ${movie.title}" 
-            title="${movie.title}"
-            onerror="this.src='${defaultImageUrl}'"
+            src="${imageUrl}" 
+            alt="Image du film ${movie.original_title}" 
+            title="${movie.original_title}"
         >
         <div>
-            <h3>${movie.title}</h3>
+            <h3>${movie.original_title}</h3>
             ${className === 'best-movie__movie' ? description : ''}
         </div>
     `;
 
-    // Ajoute le bouton dans la div après l'insertion du HTML
     movieElement.querySelector('div').appendChild(detailButton);
 
     return movieElement;
 }
 
-
 // Affiche les meilleurs films toutes catégories
-function displayBestMovies(movies) {
+async function displayBestMovies(movies) {
     const bestMovieContainer = document.getElementById('best-movie');
     const otherMoviesContainer = document.getElementById('best-movies');
 
@@ -117,32 +150,31 @@ function displayBestMovies(movies) {
         return;
     }
 
+    // Trier les films par score IMDb
     const sortedMovies = movies.sort((a, b) => b.imdb_score - a.imdb_score);
+
+    // Extraire le meilleur film
     const bestMovie = sortedMovies[0];
+
+    // Extraire uniquement les 5 films suivants
     const otherMovies = sortedMovies.slice(1, 7);
 
+    // Réinitialiser les conteneurs
     bestMovieContainer.innerHTML = '';
     otherMoviesContainer.innerHTML = '';
 
-    const bestMovieElement = createMovieElement(bestMovie, 'best-movie__movie');
+    // Ajouter le meilleur film
+    const bestMovieElement = await createMovieElement(bestMovie, 'best-movie__movie');
     bestMovieContainer.appendChild(bestMovieElement);
 
-    otherMovies.forEach(movie => {
-        const movieElement = createMovieElement(movie);
+    // Ajouter les autres films (maximum 5)
+    for (const movie of otherMovies) {
+        const movieElement = await createMovieElement(movie);
         otherMoviesContainer.appendChild(movieElement);
-    });
+    }
 
-    const showMoreButton = document.createElement('button');
-    const showLessButton = document.createElement('button');
-    showLessButton.className = 'show-less'
-    showLessButton.textContent = "Voir moins"
-    showLessButton.style.display = 'none';
-    showMoreButton.className = 'show-more';
-    showMoreButton.textContent = 'Voir plus';
-    otherMoviesContainer.appendChild(showMoreButton);
-    otherMoviesContainer.appendChild(showLessButton);
-
-    toggleMoviesVisibility(otherMoviesContainer.id);
+    // Appliquer la visibilité dynamique
+    applyDynamicVisibility(otherMoviesContainer.id);
 }
 
 
@@ -177,24 +209,14 @@ async function displayBestMoviesByGenre(genre, selected = false) {
             genreSection.innerHTML = '';
         }
 
-        sortedMoviesByGenre.forEach(movie => {
-            genreSection.appendChild(createMovieElement(movie));
+        sortedMoviesByGenre.forEach(async (movie) => {
+            genreSection.appendChild(await createMovieElement(movie));
         });
 
-        
         main.appendChild(genreSection);
 
-        const showMoreButton = document.createElement('button');
-        const showLessButton = document.createElement('button');
-        showLessButton.className = 'show-less';
-        showLessButton.textContent = "Voir moins";
-        showLessButton.style.display = 'none';
-        showMoreButton.className = 'show-more';
-        showMoreButton.textContent = 'Voir plus';
-        genreSection.appendChild(showMoreButton);
-        genreSection.appendChild(showLessButton);
-
-        toggleMoviesVisibility(genreSection.id); // Use sanitized ID
+        // Appliquer la visibilité dynamique après ajout
+        applyDynamicVisibility(genreSection.id);
 
     } catch (error) {
         console.error(`Erreur lors de l'affichage des films pour le genre ${genre.name}:`, error);
@@ -255,33 +277,39 @@ async function displayGenresList() {
     main.appendChild(otherSection);
 }
 
-function toggleMoviesVisibility(elementId) {
-    const section = document.getElementById(elementId);
+function toggleMoviesVisibility(sectionId) {
+    const section = document.getElementById(sectionId);
     if (!section) return;
+
     const movies = section.querySelectorAll('.best-movies__movie');
     const showMoreButton = section.querySelector('.show-more');
     const showLessButton = section.querySelector('.show-less');
 
     if (showMoreButton && showLessButton) {
-        // Afficher tous les films lorsque "Voir plus" est cliqué
+        // Affiche tous les films lorsque "Voir plus" est cliqué
         showMoreButton.addEventListener('click', () => {
-            console.log(elementId)
             movies.forEach(movie => {
                 movie.style.display = 'flex';
             });
             showMoreButton.style.display = 'none';
-            showLessButton.style.display = 'flex';
+            showLessButton.style.display = 'inline-block';
         });
 
-        // Réinitialiser l'affichage lorsque "Voir moins" est cliqué
+        // Réinitialise l'affichage lorsque "Voir moins" est cliqué
         showLessButton.addEventListener('click', () => {
             movies.forEach((movie, index) => {
-                // Affiche uniquement les deux premiers films comme défini dans le CSS
-                movie.style.display = index < 2 ? 'flex' : 'none';
+                movie.style.display = index < 4 ? 'flex' : 'none'; // Limite à 4 films
             });
             showLessButton.style.display = 'none';
-            showMoreButton.style.display = 'flex';
+            showMoreButton.style.display = 'inline-block';
         });
+
+        // Initialiser l'état des films et des boutons
+        movies.forEach((movie, index) => {
+            movie.style.display = index < 4 ? 'flex' : 'none';
+        });
+        showMoreButton.style.display = movies.length > 4 ? 'inline-block' : 'none';
+        showLessButton.style.display = 'none';
     }
 }
 
@@ -294,9 +322,9 @@ function updateMoviesVisibility(sectionId) {
     let maxVisible;
 
     // Détermine le nombre de films visibles selon la largeur de la fenêtre
-    if (window.innerWidth <= 768) {
+    if (window.innerWidth < 768) {
         maxVisible = 2; // Mobile
-    } else if (window.innerWidth <= 1279) {
+    } else if (window.innerWidth < 1024) {
         maxVisible = 4; // Tablette
     } else {
         maxVisible = movies.length; // Desktop (affiche tout)
@@ -339,41 +367,57 @@ function applyDynamicVisibility(sectionId) {
 }
 
 // Affiche la fenêtre modale avec les informations d'un film
-function displayModalWindow(movie) {
-    const closeButton = document.createElement('button');
-    const title = document.createElement('h2');
+async function displayModalWindow(movie) {
+    const overlay = document.querySelector('.modal-overlay');
+    modalWindow.innerHTML = ''; // Réinitialise le contenu précédent
+
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+
     const image = document.createElement('img');
+    let imageUrl = movie.image_url;
+
+    // Vérifier si l'image existe
+    if (!(await checkImageExists(imageUrl))) {
+        imageUrl = defaultImageUrl;
+    }
+
+    image.setAttribute('src', imageUrl || '../img/image_not_found.png');
+    image.setAttribute('alt', `Affiche du film ${movie.original_title}`);
+
     const details = document.createElement('div');
-    const summary = document.createElement('p');
-    const directors = document.createElement('p');
-    const actors = document.createElement('p');
+    details.className = 'modal-details';
+    details.innerHTML = `
+        <h2>${movie.original_title}</h2>
+        <p><strong>${movie.year} - ${movie.genres.join(', ')}</strong><br>
+        <strong>${movie.rated} - ${movie.duration} minutes (${movie.countries.join(', ')})</strong><br>
+        <strong>IMDB score: ${movie.imdb_score}/10</strong></p>
+        <p><strong>Réalisé par :</strong><br>${movie.directors.join(', ')}</p>
+    `;
 
-    // Mise en place des données du film
-    title.textContent = movie.title;
-    image.setAttribute('src', movie.image_url || '../img/image_not_found.png');
-    image.setAttribute('alt', `Affiche du film ${movie.title}`);
-    summary.textContent = movie.description || 'Pas de description disponible.';
-    directors.innerHTML = `<strong>Réalisé par :</strong> ${movie.directors || 'Non spécifié'}`;
-    actors.innerHTML = `<strong>Avec :</strong> ${movie.actors || 'Non spécifié'}`;
+    const bottomDetails = document.createElement('div');
+    bottomDetails.className = 'modal-bottom';
+    bottomDetails.innerHTML = `
+        <p class="description">${movie.description || 'Pas de description disponible.'}</p>
+        <p><strong>Avec :</strong><br>${movie.actors.join(', ')}</p>
+    `;
 
+    const closeButton = document.createElement('button');
     closeButton.className = 'close-button';
     closeButton.textContent = 'Fermer';
     closeButton.addEventListener('click', () => {
         modalWindow.style.display = 'none';
-        modalWindow.innerHTML = '';
+        overlay.classList.remove('active'); // Masque l'overlay
         document.body.style.overflow = 'auto';
     });
 
-    // Ajout des éléments dans la fenêtre modale
-    modalWindow.appendChild(title);
-    modalWindow.appendChild(image);
-    details.appendChild(summary);
-    details.appendChild(directors);
-    details.appendChild(actors);
-    modalWindow.appendChild(details);
-    modalWindow.appendChild(closeButton);
+    modalContent.appendChild(details);
+    modalContent.appendChild(image);
+    modalWindow.appendChild(modalContent);
+    bottomDetails.appendChild(closeButton);
+    modalWindow.appendChild(bottomDetails);
 
-    // Affiche la modale
+    overlay.classList.add('active'); // Affiche l'overlay
     modalWindow.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
