@@ -8,6 +8,7 @@ $darkgray: #404040;
 
 $font-size-xxlarge: xx-large;
 $font-size-large: 3vw;
+$font-size-xlarge: 6vw;
 $font-size-medium: 1.5vw;
 $padding-small: 10px;
 $padding-large: 20px;
@@ -92,7 +93,7 @@ header {
     position: relative;
     display: inline-block;
     margin-left: $padding-small;
-    max-width: 250px;
+    min-width: 200px;
     border: 2px solid $black;
 }
 
@@ -121,7 +122,7 @@ header {
     padding: 0;
     width: 100%;
     box-sizing: border-box;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
     scrollbar-width: thin;
 
@@ -336,7 +337,7 @@ header {
     .show-more, .show-less {
         display: flex;
         @include button-style($red);
-        padding: $padding-large;
+        padding: $padding-small;
         flex-wrap: wrap;
         justify-self: center;
         justify-content: space-around;
@@ -397,6 +398,16 @@ header {
             }
         }
     }
+
+    .dropdown-button {
+        @include typography($font-size-large, bold);
+    }
+
+    .dropdown-menu {
+        .dropdown-item {
+            @include typography($font-size-large, bold);
+        }
+    }
 }
 
 // ---------------------------
@@ -411,8 +422,12 @@ header {
         display: none;
     }
 
-    h2, label {
+    h2 {
         font-size: xx-large;
+    }
+
+    label {
+        display: none;
     }
 
     header {
@@ -425,13 +440,20 @@ header {
         }
     }
 
+    .dropdown-container {
+        margin: $padding-large auto; // Centre horizontalement
+        display: flex;
+        justify-content: center; // Centre les enfants horizontalement
+        width: 80%; // Ajuste la largeur si nécessaire
+    }
+
     .dropdown-button {
-        @include typography($font-size-large, bold);
+        @include typography($font-size-xlarge, bold);
     }
 
     .dropdown-menu {
         .dropdown-item {
-            @include typography($font-size-large, bold);
+            @include typography($font-size-xlarge, bold);
         }
     }
 
@@ -465,6 +487,9 @@ header {
 
                 button {
                     @include button-style($red);
+                    position: inherit;
+                    grid-column: 2;
+                    justify-self: center;
                 }
             }
         }
@@ -525,7 +550,7 @@ header {
         .show-more, .show-less {
             display: flex;
             @include button-style($red);
-            padding: $padding-large;
+            padding: $padding-small;
             flex-wrap: wrap;
             justify-self: center;
             justify-content: space-around;
@@ -555,6 +580,31 @@ header {
         z-index: 1000;
         padding: $padding-small;
         overflow-y: auto; /* Scroll si contenu dépasse */
+ 
+        .close-modal-button {
+            position: absolute; /* Position relative au conteneur */
+            top: 10px; /* Décalage depuis le haut */
+            right: 10px; /* Décalage depuis la droite */
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+
+        .close-modal-button::before,
+        .close-modal-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 4px; /* Épaisseur de la croix */
+            background-color: red; /* Couleur de la croix */
+            transform: translate(-50%, -50%) rotate(45deg);
+        }
+
+        .close-modal-button::after {
+        transform: translate(-50%, -50%) rotate(-45deg); /* Barre opposée */
+        }
     
         .modal-content {
             display: flex;
@@ -593,28 +643,7 @@ header {
                 font-size: 1rem;
                 margin-bottom: 10px;
             }
-
-            .close-button {
-                @include button-style($red, $white);
-                padding-left: $padding-xxlarge;
-                padding-right: $padding-xxlarge;
-                padding-top: $padding-small;
-                padding-bottom: $padding-small;
-                margin: 0 auto;
-            }
         }
-    }
-}
-
-.best-movies__movie {
-    display: none;
-
-    &.visible {
-        display: flex;
-    }
-
-    &.hidden {
-        display: none;
     }
 }
 

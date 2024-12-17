@@ -2,11 +2,13 @@
 let allGenres = [];
 const main = document.querySelector("main");
 const modalWindow = document.querySelector('.modal-window');
+// Image par défaut en cas d'absence d'image de film
 const defaultImageUrl = '../img/image_not_found.png';
 
 // Récupère les données via l'API
 async function fetchDatas(baseUrl, maxPages, datas, genre = null) {
     let results = [];
+
     for (let page = 1; page <= maxPages; page++) {
         try {
             const url =
@@ -82,7 +84,7 @@ Promise.all([
     await displayBestMoviesByGenre(randomGenre1);
     await displayBestMoviesByGenre(randomGenre2);
 
-    // Afficher les autres films
+    // Afficher les autres films (par Genres)
     await displayGenresList();
     await displayBestMoviesByGenre(allGenres[0], selected=true);
 }).catch(error => {
@@ -118,6 +120,7 @@ async function createMovieElement(movie, className = 'best-movies__movie') {
         imageUrl = defaultImageUrl;
     }
 
+    // Ajout l'évènement "click" pour l'ouverture d'une fenêtre modale avec les détails du film
     detailButton.addEventListener('click', async () => {
         await displayModalWindow(movie);
         modalWindow.style.display = 'block';
@@ -140,7 +143,7 @@ async function createMovieElement(movie, className = 'best-movies__movie') {
     return movieElement;
 }
 
-// Affiche les meilleurs films toutes catégories
+// Affiche les fills les mieux notés
 async function displayBestMovies(movies) {
     const bestMovieContainer = document.getElementById('best-movie');
     const otherMoviesContainer = document.getElementById('best-movies');
@@ -156,7 +159,7 @@ async function displayBestMovies(movies) {
     // Extraire le meilleur film
     const bestMovie = sortedMovies[0];
 
-    // Extraire uniquement les 5 films suivants
+    // Extraire uniquement les 6 films suivants
     const otherMovies = sortedMovies.slice(1, 7);
 
     // Réinitialiser les conteneurs
@@ -173,8 +176,19 @@ async function displayBestMovies(movies) {
         otherMoviesContainer.appendChild(movieElement);
     }
 
+    // Ajout des boutons Plus-Moins
+    const showMoreButton = document.createElement('button');
+    const showLessButton = document.createElement('button');
+    showLessButton.className = 'show-less';
+    showLessButton.textContent = "Voir moins";
+    showLessButton.style.display = 'none';
+    showMoreButton.className = 'show-more';
+    showMoreButton.textContent = 'Voir plus';
+    otherMoviesContainer.appendChild(showMoreButton);
+    otherMoviesContainer.appendChild(showLessButton);
+
     // Appliquer la visibilité dynamique
-    applyDynamicVisibility(otherMoviesContainer.id);
+    applyDynamicVisibility(otherMoviesContainer);
 }
 
 
@@ -203,20 +217,35 @@ async function displayBestMoviesByGenre(genre, selected = false) {
             const genreTitle = document.createElement('h2');
             genreTitle.textContent = genre.name;
 
+            main.appendChild(genreSection);
+
             genreSection.appendChild(genreTitle);
         } else {
             genreSection = document.querySelector('.other');
             genreSection.innerHTML = '';
         }
 
-        sortedMoviesByGenre.forEach(async (movie) => {
-            genreSection.appendChild(await createMovieElement(movie));
-        });
+        // Ajouter les films
+        const movieElements = await Promise.all(
+            sortedMoviesByGenre.map(async (movie) => await createMovieElement(movie))
+        );
 
-        main.appendChild(genreSection);
+        movieElements.forEach((movieElement) => genreSection.appendChild(movieElement));
+
+        
+        // Ajout des boutons Plus-Moins
+        const showMoreButton = document.createElement('button');
+        const showLessButton = document.createElement('button');
+        showLessButton.className = 'show-less';
+        showLessButton.textContent = "Voir moins";
+        showLessButton.style.display = 'none';
+        showMoreButton.className = 'show-more';
+        showMoreButton.textContent = 'Voir plus';
+        genreSection.appendChild(showMoreButton);
+        genreSection.appendChild(showLessButton);
 
         // Appliquer la visibilité dynamique après ajout
-        applyDynamicVisibility(genreSection.id);
+        applyDynamicVisibility(genreSection);
 
     } catch (error) {
         console.error(`Erreur lors de l'affichage des films pour le genre ${genre.name}:`, error);
@@ -361,9 +390,9 @@ function updateMoviesVisibility(sectionId) {
 }
 
 // Appliquer la visibilité dynamique après ajout des films
-function applyDynamicVisibility(sectionId) {
-    updateMoviesVisibility(sectionId);
-    window.addEventListener('resize', () => updateMoviesVisibility(sectionId));
+function applyDynamicVisibility(section) {
+    updateMoviesVisibility(section.id);
+    window.addEventListener('resize', () => updateMoviesVisibility(section.id));
 }
 
 // Affiche la fenêtre modale avec les informations d'un film
@@ -385,13 +414,16 @@ async function displayModalWindow(movie) {
     image.setAttribute('src', imageUrl || '../img/image_not_found.png');
     image.setAttribute('alt', `Affiche du film ${movie.original_title}`);
 
+    movieRated = movie.rated === "Not rated or unkown rating" ? "" : movie.rated.toLocaleString('fr-FR').replace(/,/g, ' '); + "$ - ";
+
     const details = document.createElement('div');
     details.className = 'modal-details';
     details.innerHTML = `
         <h2>${movie.original_title}</h2>
         <p><strong>${movie.year} - ${movie.genres.join(', ')}</strong><br>
-        <strong>${movie.rated} - ${movie.duration} minutes (${movie.countries.join(', ')})</strong><br>
-        <strong>IMDB score: ${movie.imdb_score}/10</strong></p>
+        <strong>${movieRated}${movie.duration} minutes (${movie.countries.join(', ')})</strong><br>
+        <strong>IMDB score: ${movie.imdb_score}/10</strong><br></p>
+        <p><strong>Box Office : </strong>${movie.worldwide_gross_income || "Inconnu"}</p>
         <p><strong>Réalisé par :</strong><br>${movie.directors.join(', ')}</p>
     `;
 
@@ -402,14 +434,21 @@ async function displayModalWindow(movie) {
         <p><strong>Avec :</strong><br>${movie.actors.join(', ')}</p>
     `;
 
-    const closeButton = document.createElement('button');
-    closeButton.className = 'close-button';
-    closeButton.textContent = 'Fermer';
+    const closeButton = document.createElement('div');
+
     closeButton.addEventListener('click', () => {
         modalWindow.style.display = 'none';
         overlay.classList.remove('active'); // Masque l'overlay
         document.body.style.overflow = 'auto';
     });
+    
+    if (window.innerWidth < 1024) {
+        closeButtonClassName = 'close-modal-button'; // Tablette
+    } else {
+        closeButtonClassName = 'close-button'; // Desktop (affiche tout)
+        closeButton.textContent = "Fermer";
+    }
+    closeButton.className = closeButtonClassName;
 
     modalContent.appendChild(details);
     modalContent.appendChild(image);
